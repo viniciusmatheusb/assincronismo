@@ -1,38 +1,38 @@
 import 'dart:async';
-
-void main() async {
+//Aula3.3
+void main() async{
   Stream myStream(int interval, [int? maxCount]) async* {
     int i = 1;
     while (i != maxCount) {
-      print('Contando: $i');
-      Future.delayed(Duration(seconds: interval));
+      print("Counting: $i");
+      await Future.delayed(Duration(seconds: interval));
       yield i++;
     }
-
-    print('A Stream acabou');
+    print('The Stream is finished');
   }
 
-  StreamSubscription myStreamSubcription = myStream(1).listen((event) {
+  var kakoStream = myStream(1).asBroadcastStream();
+  StreamSubscription mySubscriber = kakoStream.listen((event) {
     if (event.isEven) {
-      print('Esse número é Even!');
+      print('This number is Even!');
     }
   }, onError: (e) {
-    print('Error: $e');
-  }, onDone: () {
-    print('Deu certo');
+    print('An error happend: $e');
+  },onDone: (){
+    print('The subscriber is gone.');
   });
+  kakoStream.map((event) => 'Subscriber 2 watching: $event').listen(print);
 
   await Future.delayed(Duration(seconds: 3));
-  myStreamSubcription.pause();
-  print('Stream Pausada');
-
+  mySubscriber.pause();
+  print('Stream paused');
   await Future.delayed(Duration(seconds: 3));
-  myStreamSubcription.resume();
-  print('Stream retomada');
-
+  mySubscriber.resume();
+  print('Stream resumed');
   await Future.delayed(Duration(seconds: 3));
-  myStreamSubcription.cancel();
-  print('Stream cancelada');
+  mySubscriber.cancel();
+  print('Stream canceled');
 
-  print('A main acabou');
+
+  print('Main is finished');
 }
